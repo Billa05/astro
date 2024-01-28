@@ -135,18 +135,19 @@ console.log(activities)
 										{activity.issue_title === undefined 
 											? 
 											<>
-												<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">repository: {activity.repo_name}</a></p>
+												<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">{activity.repo_name}</a></p>
 												<br/><p>Self Project</p>
 											</> 
 											: 
 											<>
-												<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">repository: {activity.repo_name}</a></p>
+												<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">{activity.repo_name}</a></p>
 												<br/><p>Issue: {activity.issue_title}</p>
 											</>
 										}
 									</div>
-									{index !== activities.length - 1 && (<div class="h-24 w-px bg-gray-300 dark:bg-gray-700"></div>)}
+					
 								</div>
+								<div class={index !== activities.length-1 ? "h-20 w-px bg-gray-300 dark:bg-gray-700" : ""}></div>
 							))}
                             </div>
                         </div>
