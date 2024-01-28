@@ -97,7 +97,7 @@ console.log(activities)
                                     alt="Profile Picture"
                                     class="rounded-full w-48 h-48 object-cover"
                                     height="200"
-                                    src="/profile-pic.png"
+                                    src="/pic.png"
                                     style="aspect-ratio:200/200;object-fit:cover"
                                     width="200"
                                 />
@@ -147,88 +147,33 @@ console.log(activities)
                         <div class="flex-1 flex flex-col items-center justify-center">
                             <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-400 mb-4">Github updates</h1>
                             <div class="flex flex-col items-center space-y-8">
-								{activities.map((activity, index) => <div class="flex items-center justify-center w-10 h-10 rounded-full bg-transparent border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 hover:text-white dark:hover:text-white transition-colors duration-500">
-									<span>{index + 1}</span>
-									<div class={index == activities.length - 1 ? "absolute bottom-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0" : "absolute top-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0 "}>
-										{
-											activity.issue_title === undefined 
+							{activities.map((activity, index) => (
+								<div class="group relative">
+									<div class="flex items-center justify-center w-10 h-10 rounded-full bg-transparent border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 hover:text-white dark:hover:text-white transition-colors duration-500">
+										<span>{index + 1}</span>
+									</div>
+									<div class={index == activities.length - 1 ? "absolute bottom-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0" : "absolute top-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0"}>
+										{activity.issue_title === undefined 
 											? 
 											<>
-											<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">repository: ${activity.repo_name}</a></p>
-	<br><p>Self Project</p></> :
-	<>
-	<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">repository: ${activity.repo_name}</a></p>
-	<br><p>Self Project</p> </>
+												<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">repository: {activity.repo_name}</a></p>
+												<br/><p>Self Project</p>
+											</> 
+											: 
+											<>
+												<p><a href={`https://github.com/${activity.repo_name}`} target="_blank">repository: {activity.repo_name}</a></p>
+												<br/><p>Issue: {activity.issue_title}</p>
+											</>
 										}
 									</div>
-									</div>)}
+								</div>
+							))}
                             </div>
                         </div>
                         </div>
                     </section>
                 </main>
             </div>
-            <script type="module" src="/script.js" defer>
-				
-				</script>     
+            <script type="module" src="/script.js" defer></script>     
 </body>
-
-<script>
-	const container = document.querySelector('.flex.flex-col.items-center.space-y-8');
-
-activity.forEach((item, index) => {
-	const element = document.createElement('div');
-	element.className = 'group relative';
-
-	const numberDiv = document.createElement('div');
-	numberDiv.className = 'flex items-center justify-center w-10 h-10 rounded-full bg-transparent border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 hover:text-white dark:hover:text-white transition-colors duration-500';
-	numberDiv.innerHTML = `<span>${index + 1}</span>`;
-	element.appendChild(numberDiv);
-
-	const descriptionDiv = document.createElement('div');
-	if (index==activity.length-1){
-		descriptionDiv.className = 'absolute bottom-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0 ';
-	}else{
-		descriptionDiv.className = 'absolute top-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0 ';
-	}
-	if(!item.issue_title){
-		descriptionDiv.innerHTML = `<p><a href="https://github.com/${item.repo_name}" target="_blank">repository: ${item.repo_name}</a></p>
-	<br><p>Self Project</p>`;
-	}else{
-		descriptionDiv.innerHTML = `<p><a href="https://github.com/${item.repo_name}" target="_blank">repository: ${item.repo_name}</a></p>
-	<br><p>Issue: ${item.issue_title}</p>`;
-	}
-	element.appendChild(descriptionDiv);
-
-	container.appendChild(element);
-
-	numberDiv.addEventListener("mouseenter",()=>{
-		clearTimeout(timeoutId);
-		descriptionDiv.classList.remove("opacity-0");
-	})
-
-	numberDiv.addEventListener("mouseleave",()=>{
-		timeoutId = setTimeout(() => {
-			descriptionDiv.classList.add("opacity-0");
-		}, 200); // 200ms delay before hiding the description
-	})
-
-	descriptionDiv.addEventListener("mouseenter",()=>{
-		clearTimeout(timeoutId);
-	})
-
-	descriptionDiv.addEventListener("mouseleave",()=>{
-		descriptionDiv.classList.add("opacity-0");
-	})
-
-	element.addEventListener("mouseleave",()=>{
-		descriptionDiv.classList.add("opacity-0");
-	})
-
-	if(index!=activity.length-1){
-		const separator = document.createElement('div');
-		separator.className = 'h-24 w-px bg-gray-300 dark:bg-gray-700';
-		container.appendChild(separator);
-	}
-</script>
 </html>
