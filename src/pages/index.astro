@@ -4,47 +4,52 @@ import axios from "axios";
 
 const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN
 
-const activities = []
+let page = 1;
+let activities = [];
 
-const response = await axios.get('https://api.github.com/users/BIlla05/events', {
-	headers: {
-		Authorization: `Bearer ${GITHUB_TOKEN}`
+while (true) {
+	const response = await axios.get(`https://api.github.com/users/BIlla05/events?page=${page}&per_page=100`, {
+		headers: {
+			Authorization: `Bearer ${GITHUB_TOKEN}`
+		}
+	});
+
+	if (response.data.length === 0) {
+		break;
 	}
-});
 
-if (response.status < 200 || response.status >= 300) {
-	throw new Error(`HTTP error! status: ${response.status}`);
-}
+	const data = response.data;
 
-const data = await response.data;
+	for (let i=0;i<data.length;i++){
+		const date = new Date(data[i]?.created_at);
+		let repo_name = data[i]?.repo?.name;
+		let issue_title = data[i]?.payload?.issue?.title;
+		let commit_msg = data[i]?.payload?.commits?.[0]?.message;
 
-for (let i=0;i<data.length;i++){
-	const date = new Date(data[i]?.created_at);
-	let repo_name = data[i]?.repo?.name;
-	let issue_title = data[i]?.payload?.issue?.title;
-	let commit_msg = data[i]?.payload?.commits?.[0]?.message;
+		let existingActivity = activities.find(a => a.issue_title === issue_title);
 
-	let existingActivity = activities.find(a => a.issue_title === issue_title);
-
-	if (existingActivity) {
-		let existingDate = new Date(existingActivity.date);
-		if (date > existingDate) {
-			let index = activities.indexOf(existingActivity);
-			activities[index] = {
+		if (existingActivity) {
+			let existingDate = new Date(existingActivity.date);
+			if (date > existingDate) {
+				let index = activities.indexOf(existingActivity);
+				activities[index] = {
+					date: date,
+					repo_name: repo_name,
+					issue_title: issue_title,
+					commit_msg: commit_msg
+				};
+			}
+		} else {
+			activities.push({
 				date: date,
 				repo_name: repo_name,
 				issue_title: issue_title,
 				commit_msg: commit_msg
-			};
+			});
 		}
-	} else {
-		activities.push({
-			date: date,
-			repo_name: repo_name,
-			issue_title: issue_title,
-			commit_msg: commit_msg
-		});
 	}
+
+	page++;
 }
 
 console.log(activities)
@@ -56,7 +61,6 @@ console.log(activities)
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Biresh Biswas</title>
-        <!-- <link rel="stylesheet" href="style.css"> -->
 
 </head>
 <body>
@@ -121,13 +125,13 @@ console.log(activities)
                         </div>
                         <div class="flex-1 flex flex-col items-center justify-center">
                             <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-400 mb-4">Github updates</h1>
-                            <div class="flex flex-col items-center space-y-8">
+                            <div class="flex flex-col items-center space-y-8	">
 							{activities.map((activity, index) => (
 								<div class="group relative">
 									<div class="flex items-center justify-center w-10 h-10 rounded-full bg-transparent border border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-700 hover:text-white dark:hover:text-white transition-colors duration-500">
 										<span>{index + 1}</span>
 									</div>
-									<div class={index == activities.length - 1 ? "absolute bottom-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0" : "absolute top-full mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0"}>
+									<div class={index == activities.length - 1 ? "absolute bottom-full w-auto mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200" : "absolute top-full w-auto mt-2 p-2 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 rounded shadow opacity-0 group-hover:opacity-100 transition-opacity duration-200"}>
 										{activity.issue_title === undefined 
 											? 
 											<>
@@ -141,6 +145,7 @@ console.log(activities)
 											</>
 										}
 									</div>
+									{index !== activities.length - 1 && (<div class="h-24 w-px bg-gray-300 dark:bg-gray-700"></div>)}
 								</div>
 							))}
                             </div>
