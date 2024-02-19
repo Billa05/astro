@@ -2,52 +2,30 @@
 import "../style.css"
 import axios from "axios";
 
-const GITHUB_TOKEN = import.meta.env.GITHUB_TOKEN
-
-let page = 1;
 let activities = [];
 
-while (true) {
-    const response = await axios.get(`https://api.github.com/users/BIlla05/events?page=${page}&per_page=100`, {
-        headers: {
-            Authorization: `Bearer ${GITHUB_TOKEN}`
-        }
+await axios.get("https://api.github.com/search/issues?q=is:pr+is:merged+author:billa05")
+    .then(response => {
+        response.data.items.forEach(item => {
+            activities.push({
+                repo_name: item.repository_url.split("https://api.github.com/repos/")[1],
+                issue_title: item.title,
+                issue_link: item.html_url
+            })
+        })
+    })
+    .catch(error => {
+        console.error(error);
     });
 
-    if (response.data.length === 0) {
-        break;
-    }
+activities.pop();
 
-    const data = response.data;
 
-    const newActivities = data.map(event => {
-        const date = new Date(event?.created_at);
-        const repo_name = event?.repo?.name;
-        const issue_title = event?.payload?.issue?.title;
-        const commit_msg = event?.payload?.commits?.[0]?.message;
 
-        return {
-            date,
-            repo_name,
-            issue_title,
-            commit_msg
-        };
-    });
 
-    activities = [...activities, ...newActivities];
 
-    // Remove duplicates, keeping only the latest event
-    activities = activities.sort((a, b) => new Date(b.date) - new Date(a.date))
-        .filter((activity, index, self) =>
-            index === self.findIndex((a) => (
-                a.issue_title === activity.issue_title
-            ))
-        )
 
-    page++;
-}
-
-// console.log(activities)
+console.log(activities)
 ---
 
 <!DOCTYPE html>
@@ -59,9 +37,6 @@ while (true) {
 
 </head>
 <body>
-	{activities.map(ac => {
-
-	})}
     <div class="relative min-h-screen bg-light-blue-200 p-10 transition-colors duration-500">
                 <main class="min-h-screen">
                     <section class="flex flex-col md:flex-row gap-10">
