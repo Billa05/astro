@@ -8,51 +8,46 @@ let page = 1;
 let activities = [];
 
 while (true) {
-	const response = await axios.get(`https://api.github.com/users/BIlla05/events?page=${page}&per_page=100`, {
-		headers: {
-			Authorization: `Bearer ${GITHUB_TOKEN}`
-		}
-	});
+    const response = await axios.get(`https://api.github.com/users/BIlla05/events?page=${page}&per_page=100`, {
+        headers: {
+            Authorization: `Bearer ${GITHUB_TOKEN}`
+        }
+    });
 
-	if (response.data.length === 0) {
-		break;
-	}
+    if (response.data.length === 0) {
+        break;
+    }
 
-	const data = response.data;
+    const data = response.data;
 
-	for (let i=0;i<data.length;i++){
-		const date = new Date(data[i]?.created_at);
-		let repo_name = data[i]?.repo?.name;
-		let issue_title = data[i]?.payload?.issue?.title;
-		let commit_msg = data[i]?.payload?.commits?.[0]?.message;
+    const newActivities = data.map(event => {
+        const date = new Date(event?.created_at);
+        const repo_name = event?.repo?.name;
+        const issue_title = event?.payload?.issue?.title;
+        const commit_msg = event?.payload?.commits?.[0]?.message;
 
-		let existingActivity = activities.find(a => a.issue_title === issue_title);
+        return {
+            date,
+            repo_name,
+            issue_title,
+            commit_msg
+        };
+    });
 
-		if (existingActivity) {
-			let existingDate = new Date(existingActivity.date);
-			if (date > existingDate) {
-				let index = activities.indexOf(existingActivity);
-				activities[index] = {
-					date: date,
-					repo_name: repo_name,
-					issue_title: issue_title,
-					commit_msg: commit_msg
-				};
-			}
-		} else {
-			activities.push({
-				date: date,
-				repo_name: repo_name,
-				issue_title: issue_title,
-				commit_msg: commit_msg
-			});
-		}
-	}
+    activities = [...activities, ...newActivities];
 
-	page++;
+    // Remove duplicates, keeping only the latest event
+    activities = activities.sort((a, b) => new Date(b.date) - new Date(a.date))
+        .filter((activity, index, self) =>
+            index === self.findIndex((a) => (
+                a.issue_title === activity.issue_title
+            ))
+        )
+
+    page++;
 }
 
-console.log(activities)
+// console.log(activities)
 ---
 
 <!DOCTYPE html>
@@ -91,11 +86,11 @@ console.log(activities)
                                 </div>
                             </div>
                             <div class="mt-10">
-                                <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-400 mb-4">Currently Working On</h1>
+                                <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-400 mb-4">Currently working on</h1>
                                 <div class="p-4 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 transition-colors duration-500">
-                                    <a href="https://github.com/Billa05/Billa05.github.io" target="_blank"><h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">My website</h2></a>
+                                    <a href="https://github.com/Billa05/Billa05.github.io" target="_blank"><h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Spotify liked songs</h2></a>
                                     <p class="text-gray-600 dark:text-gray-400">
-                                        integrated GitHub API in my website.
+                                        writing a script which will fetch my liked songs and split them into different playlists based on the language of the song.
                                     </p>
                                 </div>
                             </div>
@@ -108,12 +103,12 @@ console.log(activities)
                                             I created a Tic Tac Toe game using JavaScript, resulting in a code that heavily features JavaScript.</p>
                                     </div>
                                     <div class="p-4 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 transition-colors duration-500">
-                                        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">TO-DO Application</h2>
-                                        <p class="text-gray-600 dark:text-gray-400"> I am building a to-do application that will save the tasks in the cookies of the website.</p>
+                                        <a href="https://github.com/Billa05/To-Do-chromExtension" target="_blank"><h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">TO-DO chrome extension</h2></a>
+                                        <p class="text-gray-600 dark:text-gray-400"> I builed a simple To-Do chrome extension which saves tasks in local storage of the browser.</p>
                                     </div>
                                     <div class="p-4 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 transition-colors duration-500">
-                                        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Project 3</h2>
-                                        <p class="text-gray-600 dark:text-gray-400">SOON</p>
+                                        <a href="https://ai-roadmap-two.vercel.app/" target="_blank"><h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Ai-roadmap frontend</h2></a>
+                                        <p class="text-gray-600 dark:text-gray-400"> Building the frontend for Ai-Roadmap application</p>
                                     </div>
                                     <div class="p-4 border border-gray-300 dark:border-gray-700 rounded bg-white dark:bg-gray-800 transition-colors duration-500">
                                         <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">Project 4</h2>
